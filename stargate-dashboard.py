@@ -33,12 +33,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar for refresh control
-st.sidebar.title("Controls")
-auto_refresh = st.sidebar.checkbox("Auto-refresh every 30 seconds", value=False)
-if auto_refresh:
-    st.sidebar.info("Data will refresh automatically every 30 seconds")
-
 # Main content
 try:
     with st.spinner("Fetching latest data from VeChain mainnet..."):
@@ -125,11 +119,6 @@ try:
     # Add timestamp
     st.markdown("---")
     st.caption(f"Last updated: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
-    # Auto-refresh functionality
-    if auto_refresh:
-        st.empty()
-        st.rerun()
 
 except Exception as e:
     st.error(f"Error fetching data: {str(e)}")
