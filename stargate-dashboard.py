@@ -36,10 +36,10 @@ st.markdown("""
 # Main content
 try:
     with st.spinner("Fetching latest data from VeChain mainnet..."):
-        result, total_holders = fetch_nft_mint_counts()
+        result, total_holders, vet_staked = fetch_nft_mint_counts()
     
     # Display total in a prominent metric
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         st.metric(
@@ -56,6 +56,15 @@ try:
         )
     
     with col3:
+        # Calculate total VET staked
+        total_vet_staked = sum(vet_staked.values())
+        st.metric(
+            label="Total VET Staked",
+            value=f"{total_vet_staked:,}",
+            delta=None
+        )
+    
+    with col4:
         # Find the level with most holders
         max_level = max(result, key=result.get)
         max_count = result[max_level]
@@ -68,7 +77,10 @@ try:
     st.markdown("---")
     
     # Create DataFrame for better display
-    df = pd.DataFrame(list(result.items()), columns=['Level', 'Holders'])
+    df = pd.DataFrame([
+        {'Level': level, 'Holders': count, 'VET Staked': vet_staked[level]}
+        for level, count in result.items()
+    ])
     df = df.sort_values('Holders', ascending=False)
     
     # Display table
@@ -76,7 +88,10 @@ try:
     
     # Create a styled table
     st.dataframe(
-        df.style.format({'Holders': '{:,}'}).background_gradient(subset=['Holders'], cmap='Blues'),
+        df.style.format({
+            'Holders': '{:,}',
+            'VET Staked': '{:,}'
+        }).background_gradient(subset=['Holders'], cmap='Blues'),
         use_container_width=True,
         hide_index=True
     )
