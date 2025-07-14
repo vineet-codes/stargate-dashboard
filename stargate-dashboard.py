@@ -36,7 +36,7 @@ st.markdown("""
 # Main content
 try:
     with st.spinner("Fetching latest data from VeChain mainnet..."):
-        result, total_holders, vet_staked = fetch_nft_mint_counts()
+        result, total_holders, vet_staked, nfts_remaining = fetch_nft_mint_counts()
     
     # Display total in a prominent metric
     col1, col2, col3, col4 = st.columns(4)
@@ -78,7 +78,12 @@ try:
     
     # Create DataFrame for better display
     df = pd.DataFrame([
-        {'Level': level, 'Holders': count, 'VET Staked': vet_staked[level]}
+        {
+            'Level': level,
+            'Holders': count,
+            'Remaining': nfts_remaining[level],
+            'VET Staked': vet_staked[level]
+        }
         for level, count in result.items()
     ])
     df = df.sort_values('Holders', ascending=False)
@@ -90,6 +95,7 @@ try:
     st.dataframe(
         df.style.format({
             'Holders': '{:,}',
+            'Remaining': '{:,}',
             'VET Staked': '{:,}'
         }).background_gradient(subset=['Holders'], cmap='Blues'),
         use_container_width=True,

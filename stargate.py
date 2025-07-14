@@ -17,16 +17,30 @@ LEVEL_MAP = {
 
 # VET collateral mapping
 VET_COLLATERAL_MAP = {
-    1: 1_000_000,
-    2: 5_000_000,
-    3: 15_000_000,
-    4: 600_000,
-    5: 1_600_000,
-    6: 5_600_000,
-    7: 15_600_000,
-    8: 10_000,
-    9: 50_000,
-    10: 200_000,
+    "Strength": 1_000_000,
+    "Thunder": 5_000_000,
+    "Mjolnir": 15_000_000,
+    "VeThorX": 600_000,
+    "StrengthX": 1_600_000,
+    "ThunderX": 5_600_000,
+    "MjolnirX": 15_600_000,
+    "Dawn": 10_000,
+    "Lightning": 50_000,
+    "Flash": 200_000,
+}
+
+# Add limited supply mapping from the table
+LIMITED_SUPPLY_MAP = {
+    "Strength": 2500,    # Strength
+    "Thunder": 300,     # Thunder
+    "Mjolnir": 100,     # Mjolnir
+    "VeThorX": 735,     # VeThor X
+    "StrengthX": 843,     # Strength X
+    "ThunderX": 180,     # Thunder X
+    "MjolnirX": 158,     # Mjolnir X
+    "Dawn": 500_000, # Dawn
+    "Lightning": 100_000, # Lightning
+    "Flash": 25_000, # Flash
 }
 
 def fetch_nft_mint_counts():
@@ -41,16 +55,25 @@ def fetch_nft_mint_counts():
     
     result = {}
     vet_staked = {}
+    nfts_remaining = {}
     for level, count in data["byLevel"].items():
-        level_name = LEVEL_MAP[int(level)]
+        # print(level, count)
+        # level_int = int(level)
+        level_name = level
         result[level_name] = count
-        vet_staked[level_name] = VET_COLLATERAL_MAP[int(level)] * count
+        vet_staked[level_name] = VET_COLLATERAL_MAP[level] * count
+        # Calculate NFTs remaining for this level
+        limited_supply = LIMITED_SUPPLY_MAP.get(level)
+        nfts_remaining[level_name] = limited_supply - count if limited_supply is not None else None
+
+    # print(result, total, vet_staked, nfts_remaining)
     
-    return result, total, vet_staked
+    return result, total, vet_staked, nfts_remaining
 
 
 if __name__ == "__main__":
-    result, total = fetch_nft_mint_counts()
+    result, total, vet_staked, nfts_remaining = fetch_nft_mint_counts()
     print(f"Total holders: {total}")
-    for level, count in result.items():
-        print(f"{level}: {count}")
+    print(f"{'Level':<12} {'Minted':<8} {'Remaining':<10} {'VET Staked':<12}")
+    for level in result:
+        print(f"{level:<12} {result[level]:<8} {nfts_remaining[level]:<10} {vet_staked[level]:<12}")
